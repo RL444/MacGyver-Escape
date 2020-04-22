@@ -13,6 +13,8 @@ HEIGHT = 640
 WIDTH_OPTION = 40
 HEIGHT_OPTION  = 40
 FPS = 30
+SPRITE_HEIGHT = 40
+SPRITE_WIDTH = 40
 
 def load_assets(folder_path):
     """Load and convert all png file of a folder into a dictionnary to be returned"""
@@ -33,7 +35,7 @@ class Sprite(pygame.sprite.Sprite):
         self.rect.y = pos[1]
 
     def compare_pos(self, pos):
-        """ Compare position of this sprite with position in parameter 
+        """ Compare position of this sprite with position in parameter
         return a boolean"""
         if self.rect.x == pos[0] and self.rect.y == pos[1]:
             return True
@@ -46,7 +48,7 @@ class Maze:
         super().__init__()
         #Load map, create a list of Sprite instance corresponding to the status wall or floor with right position
         self.map = self.__init_map(folder_path)
-        self.guardian = Sprite(assets["guardian"],(14*40,8*40))
+        self.guardian = Sprite(assets["guardian"], (14*SPRITE_WIDTH, 8*SPRITE_HEIGHT))
         self.items = self.__init_objects()
 
     def __init_map(self, folder_path):
@@ -60,10 +62,10 @@ class Maze:
                 for column, val in enumerate(line):
                     if int(val):
                         result.append(
-                            Sprite(assets["floor"], (column*40, row*40)))
+                            Sprite(assets["floor"], (column*SPRITE_WIDTH, row*SPRITE_HEIGHT)))
                     else:
                         result.append(
-                            Sprite(assets["wall"], (column*40, row*40)))
+                            Sprite(assets["wall"], (column*SPRITE_WIDTH, row*SPRITE_HEIGHT)))
         return result
 
     def __init_objects(self):
@@ -76,7 +78,8 @@ class Maze:
             y = randint(0, 14)
             if (self.compare_sprite((x,y), "floor") and
                 not self.guardian.compare_pos((x,y))):
-                results.append(Sprite(assets[sprite[len(results)]], (x*40, y*40)))
+                results.append(
+                    Sprite(assets[sprite[len(results)]], (x*SPRITE_WIDTH, y*SPRITE_HEIGHT)))
         return results
 
     def compare_sprite(self, pos, sprite_name):
@@ -111,7 +114,8 @@ class Player(Sprite):
             if len(self.items) < 3:
                 self.check_objects()
             else:
-                self.items.append(Sprite(assets["syringe"], (5*40,15*40)))
+                self.items.append(
+                    Sprite(assets["syringe"], (5*SPRITE_WIDTH, 15*SPRITE_HEIGHT)))
                 #to be modify
                 all_sprites.add(self.items[3])
             self.check_mov()
@@ -121,7 +125,7 @@ class Player(Sprite):
         kill guardian or player"""
         if (maze.guardian.rect.x == self.rect.x and 
         maze.guardian.rect.y == self.rect.y):
-            if len(self.items) == 3:
+            if len(self.items) > 2:
                 self.escape = True
             else:
                 self.alive = False
@@ -130,63 +134,62 @@ class Player(Sprite):
         for i,item in enumerate(maze.items[:]):
             if (item.rect.x == self.rect.x and
             item.rect.y == self.rect.y):
-               self.items.append(maze.items.pop(i))
-               #Modify position of items to place it our of maze
-               index = len(self.items) - 1
-               self.items[index].rect.x = index * 40
-               self.items[index].rect.y = 15 * 40
-               #Not possible to have two items on same place so there is no need to continue test
-               break
+                self.items.append(maze.items.pop(i))
+                #Modify position of items to place it our of maze
+                index = len(self.items) - 1
+                self.items[index].rect.x = index * SPRITE_WIDTH
+                self.items[index].rect.y = 15 * SPRITE_HEIGHT
 
     def check_mov(self):
         """fonction that check the validity of move of the player and change target, speed and movement status if movement allow"""
         keystate = pygame.key.get_pressed()
         if (keystate[pygame.K_LEFT] and
         self.rect.left > 0 and
-        maze.compare_sprite(self.pos_left(), "floor")):
-            self.target[0] -= 40
-            self.speed[0] = -10
+        maze.compare_sprite(self.pos_left, "floor")):
+            self.target[0] -= SPRITE_WIDTH
+            self.speed[0] = -SPRITE_WIDTH//4
             self.moving = True
 
         if (keystate[pygame.K_RIGHT] and
         self.rect.right < WIDTH - WIDTH_OPTION and 
-        maze.compare_sprite(self.pos_right(), "floor")):
-            self.target[0] += 40
-            self.speed[0] = +10
+        maze.compare_sprite(self.pos_right, "floor")):
+            self.target[0] += SPRITE_WIDTH
+            self.speed[0] = +SPRITE_WIDTH//4
             self.moving = True
 
         if (keystate[pygame.K_UP] and
         self.rect.top > 0 and
-        maze.compare_sprite(self.pos_up(), "floor")):
-            self.target[1] -= 40
-            self.speed[1] = -10
+        maze.compare_sprite(self.pos_up, "floor")):
+            self.target[1] -= SPRITE_HEIGHT
+            self.speed[1] = -SPRITE_HEIGHT//4
             self.moving = True
 
         if (keystate[pygame.K_DOWN] and
         self.rect.bottom < HEIGHT - HEIGHT_OPTION and
-        maze.compare_sprite(self.pos_down(), "floor")):
-            self.target[1] += 40
-            self.speed[1] = +10
+        maze.compare_sprite(self.pos_down, "floor")):
+            self.target[1] += SPRITE_HEIGHT
+            self.speed[1] = +SPRITE_HEIGHT//4
             self.moving = True
 
+    @property
     def pos_left(self):
         """Return tuple of index from sprite at the left of player """
-        return ((self.rect.x-40)//40, self.rect.y//40)
+        return ((self.rect.x-SPRITE_WIDTH)//SPRITE_WIDTH, self.rect.y//SPRITE_HEIGHT)
 
-
+    @property
     def pos_right(self):
         """Return tuple of index from sprite at the left of player """
-        return ((self.rect.x+40)//40, self.rect.y//40)
+        return ((self.rect.x+SPRITE_WIDTH)//SPRITE_WIDTH, self.rect.y//SPRITE_HEIGHT)
 
-
+    @property
     def pos_up(self):
         """Return tuple of index from sprite at the left of player """
-        return (self.rect.x//40, (self.rect.y-40)//40)
+        return (self.rect.x//SPRITE_WIDTH, (self.rect.y-SPRITE_HEIGHT)//SPRITE_HEIGHT)
 
-
+    @property
     def pos_down(self):
         """Return tuple of index from sprite at the left of player """
-        return (self.rect.x//40, (self.rect.y+40)//40)
+        return (self.rect.x//SPRITE_WIDTH, (self.rect.y+SPRITE_HEIGHT)//SPRITE_HEIGHT)
 
 
 # initialize pygame and create Game Window
@@ -201,13 +204,14 @@ assets = load_assets(ressources)
 
 #Instance for main classes
 maze = Maze(ressources)
-player = Player(assets["player"], (2*40, 1*40))
+player = Player(assets["player"], (2*SPRITE_WIDTH, 1*SPRITE_HEIGHT))
 
 #Load Sprites in group
 all_sprites = pygame.sprite.Group()
 for sprite in maze.map:
     all_sprites.add(sprite)
 all_sprites.add(maze.guardian)
+
 for sprite in maze.items:
     all_sprites.add(sprite)
 all_sprites.add(player)
@@ -236,6 +240,7 @@ while running:
 
     # Draw / render
     screen.fill((0,0,0))
+
     all_sprites.draw(screen)
 
     #Display changes on screen
