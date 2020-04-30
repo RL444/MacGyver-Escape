@@ -289,7 +289,7 @@ class Maze:
             ):
                 self.items.append(Sprite(assets[sprites_items[len(self.items)]], pos))
 
-    def update(self, l):
+    def update(self, assets):
         """Update the status of the maze each frame"""
         keystate = pygame.key.get_pressed()
         if (
