@@ -1,3 +1,5 @@
 env/
 .vscode/
 TODO.md
+__pycache__/
+*.pyc
