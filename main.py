@@ -4,7 +4,7 @@ from random import randint
 import pygame
 from pathlib import Path
 
-import init
+import constant
 
 
 class Game:
@@ -13,13 +13,13 @@ class Game:
     def __init__(self):
         # Initialize Pygame basics
         pygame.init()
-        self.width = (init.MAZE_W + init.OPTIONAL_W) * init.SPRITE_W
-        self.height = (init.MAZE_H + init.OPTIONAL_H) * init.SPRITE_H
+        self.width = (constant.MAZE_W + constant.OPTIONAL_W) * constant.SPRITE_W
+        self.height = (constant.MAZE_H + constant.OPTIONAL_H) * constant.SPRITE_H
         self.screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("My Game")
         self.clock = pygame.time.Clock()
 
-        self.status = init.MENU
+        self.status = constant.MENU
 
         # Load all information
         self.__load_data()
@@ -33,7 +33,7 @@ class Game:
                 storage[path.stem] = pygame.image.load(str(path)).convert()
         except RuntimeError as error:
             print(error)
-            self.status = init.EXIT
+            self.status = constant.EXIT
 
         return storage
 
@@ -68,24 +68,24 @@ class Game:
         except (FileNotFoundError, FileExistsError) as error:
             print(error)
             print("Please check ressource folder before playing Game")
-            self.status = init.EXIT
+            self.status = constant.EXIT
         except KeyError as error:
             print(f"error while attempting to read {error}" + "from data.jon file")
-            self.status = init.EXIT
+            self.status = constant.EXIT
 
     def run(self):
         """function used to mange the game display and behavior"""
         while self.status:
             # Keep loop running at the right speed
-            self.clock.tick(init.FPS)
+            self.clock.tick(constant.FPS)
             # Process input (events)
             for event in pygame.event.get():
                 # check for closing window
                 if event.type == pygame.QUIT:
-                    self.status = init.EXIT
+                    self.status = constant.EXIT
 
             # Display depending on game status
-            if self.status == init.MENU:
+            if self.status == constant.MENU:
                 self.display_message("MacGyver Escape")
 
                 self.button(
@@ -94,9 +94,9 @@ class Game:
                     self.height * 2 / 3,
                     100,
                     50,
-                    init.GREEN,
-                    init.BRIGHT_GREEN,
-                    init.PLAY,
+                    constant.GREEN,
+                    constant.BRIGHT_GREEN,
+                    constant.PLAY,
                 )
                 self.button(
                     "Quit",
@@ -104,28 +104,28 @@ class Game:
                     self.height * 2 / 3,
                     100,
                     50,
-                    init.RED,
-                    init.BRIGHT_RED,
-                    init.EXIT,
+                    constant.RED,
+                    constant.BRIGHT_RED,
+                    constant.EXIT,
                 )
 
                 pygame.display.update()
 
-            elif self.status == init.PLAY:
-                self.screen.fill(init.BLACK)
+            elif self.status == constant.PLAY:
+                self.screen.fill(constant.BLACK)
                 # TODO
                 self.maze.update(self.assets)
                 if (
-                    self.maze.player.status == init.DEAD
-                    or self.maze.player.status == init.WINNER
+                    self.maze.player.status == constant.DEAD
+                    or self.maze.player.status == constant.WINNER
                 ):
-                    self.status = init.FINISH
+                    self.status = constant.FINISH
                 self.all_sprites.update()
                 self.all_sprites.draw(self.screen)
                 pygame.display.flip()
 
-            elif self.status == init.FINISH:
-                sentence = f"You are {'DEAD' if self.maze.player.status == init.DEAD else 'WINNER'}"
+            elif self.status == constant.FINISH:
+                sentence = f"You are {'DEAD' if self.maze.player.status == constant.DEAD else 'WINNER'}"
                 self.display_message(sentence)
 
                 self.button(
@@ -134,9 +134,9 @@ class Game:
                     self.height * 2 / 3,
                     100,
                     50,
-                    init.GREEN,
-                    init.BRIGHT_GREEN,
-                    init.RESTART,
+                    constant.GREEN,
+                    constant.BRIGHT_GREEN,
+                    constant.RESTART,
                 )
                 self.button(
                     "Quit",
@@ -144,21 +144,21 @@ class Game:
                     self.height * 2 / 3,
                     100,
                     50,
-                    init.RED,
-                    init.BRIGHT_RED,
-                    init.EXIT,
+                    constant.RED,
+                    constant.BRIGHT_RED,
+                    constant.EXIT,
                 )
 
                 pygame.display.update()
 
-            elif self.status == init.RESTART:
+            elif self.status == constant.RESTART:
                 self.__init__()
-                self.status = init.PLAY
+                self.status = constant.PLAY
 
         pygame.quit()
 
     def text_objects(self, text, font):
-        textSurface = font.render(text, True, init.BLACK)
+        textSurface = font.render(text, True, constant.BLACK)
         return textSurface, textSurface.get_rect()
 
     def button(self, msg, x, y, w, h, ic, ac, action=None):
@@ -178,7 +178,7 @@ class Game:
 
     def display_message(self, sentence):
         """Display sentence on screen on white fill background"""
-        self.screen.fill(init.WHITE)
+        self.screen.fill(constant.WHITE)
         largeText = pygame.font.Font("freesansbold.ttf", 60)
         TextSurf, TextRect = self.text_objects(sentence, largeText)
         TextRect.center = ((self.width / 2), (self.height / 3))
@@ -192,22 +192,22 @@ class Sprite(pygame.sprite.Sprite):
         super().__init__()
         self.image = img
         self.rect = self.image.get_rect()
-        self.rect.topleft = (pos[0] * init.SPRITE_W, pos[1] * init.SPRITE_H)
-        self.image.set_colorkey(init.BLACK)
+        self.rect.topleft = (pos[0] * constant.SPRITE_W, pos[1] * constant.SPRITE_H)
+        self.image.set_colorkey(constant.BLACK)
 
     @property
     def pos(self):
         """Return tuple position of sprite after conversion from pixel
         to index referential"""
         return (
-            self.rect.topleft[0] // init.SPRITE_W,
-            self.rect.topleft[1] // init.SPRITE_H,
+            self.rect.topleft[0] // constant.SPRITE_W,
+            self.rect.topleft[1] // constant.SPRITE_H,
         )
 
     @pos.setter
     def pos(self, pos):
         """Set position of sprite in pixel from index tuple"""
-        self.rect.topleft = (pos[0] * init.SPRITE_W, pos[1] * init.SPRITE_H)
+        self.rect.topleft = (pos[0] * constant.SPRITE_W, pos[1] * constant.SPRITE_H)
 
 
 class Player:
@@ -216,7 +216,7 @@ class Player:
     def __init__(self, img, pos):
         self.sprite = Sprite(img, pos)
         self.items = []
-        self.status = init.ALIVE
+        self.status = constant.ALIVE
 
     @property
     def pos(self):
@@ -289,7 +289,7 @@ class Maze:
             ):
                 self.items.append(Sprite(assets[sprites_items[len(self.items)]], pos))
 
-    def update(self, l):
+    def update(self, assets):
         """Update the status of the maze each frame"""
         keystate = pygame.key.get_pressed()
         if (
@@ -301,7 +301,7 @@ class Maze:
 
         if (
             keystate[pygame.K_RIGHT]
-            and self.player.pos_right[0] < init.MAZE_W
+            and self.player.pos_right[0] < constant.MAZE_W
             and self.map[self.player.pos_right].image == assets["floor"]
         ):
             self.player.move_right
@@ -315,22 +315,22 @@ class Maze:
 
         if (
             keystate[pygame.K_DOWN]
-            and self.player.pos_down[1] < init.MAZE_H
+            and self.player.pos_down[1] < constant.MAZE_H
             and self.map[self.player.pos_down].image == assets["floor"]
         ):
             self.player.move_down
 
         if self.player.pos == self.guardian.pos:
             if len(self.player.items) > 2:
-                self.player.status = init.WINNER
+                self.player.status = constant.WINNER
             else:
-                self.player.status = init.DEAD
+                self.player.status = constant.DEAD
 
         for i, sprite in enumerate(self.items[:]):
             if sprite.pos == self.player.pos:
                 self.player.items.append(self.items.pop(i))
                 index = len(self.player.items) - 1
-                self.player.items[index].pos = (index, init.MAZE_H + 1)
+                self.player.items[index].pos = (index, constant.MAZE_H + 1)
 
 
 if __name__ == "__main__":
