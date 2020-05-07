@@ -6,9 +6,12 @@ import constant
 
 
 class Button:
-    """ Interactive button link to an action when presss """
+    """ Interactive button link with different color for hover
+    and return if it had been clicked during display """
 
     def __init__(self, pos, color, color_hover, message):
+        """ Initialize a rect object, colors and
+        a Message instance display in rect center """
         self.rect = pygame.Rect(
             pos[0] * constant.SPRITE_W,
             pos[1] * constant.SPRITE_H,
@@ -18,10 +21,15 @@ class Button:
         self.color = color
         self.color_hover = color_hover
         self.message = Message(
-            self.rect.center, message, constant.SMALL_SIZE, constant.BIG_FONT, constant.BLACK
+            self.rect.center,
+            message,
+            constant.SMALL_SIZE,
+            constant.BIG_FONT,
+            constant.BLACK,
         )
 
     def _contain(self, pos):
+        """ return is Button instance contain the position pos """
         if (
             self.width_min <= pos[0]
             and self.width_max >= pos[0]
@@ -48,7 +56,7 @@ class Button:
 
 
 class Message:
-    """ display a message with 2 possible size: Big and small """
+    """ Set a message to be displayed with 2 possible size: Big and Small """
 
     def __init__(self, pos, text, size, font, color):
         self.font = pygame.font.SysFont(font, size)
@@ -58,7 +66,3 @@ class Message:
 
     def display(self, screen):
         screen.blit(self.textSurface, self.rect)
-
-    def update(self, text, color):
-        self.textSurface = self.font.render(text, True, color)
-        self.rect.fit(self.textSurface.get_rect())

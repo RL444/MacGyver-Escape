@@ -10,6 +10,8 @@ class Game:
     """ Class managing the state machine and general information of the Game"""
 
     def __init__(self):
+        """ init pygame screen, maze object for gameplay and all preset button
+        and message to be display on screen"""
         # Initialize Pygame basics
         pygame.init()
         self.width = (
@@ -23,6 +25,7 @@ class Game:
         pygame.display.set_caption("Mac Gyver Escape")
         self.clock = pygame.time.Clock()
 
+        # Initialize Button and Message
         self.start_button = Button(
             (constant.MAZE_SIZE // 5, constant.MAZE_SIZE * 2 // 3),
             constant.GREEN,
@@ -47,6 +50,9 @@ class Game:
 
         self.status = constant.MENU
 
+        # If Maze object instance goes bad
+        # it is impossible to play the game
+        # so Exit with error message
         try:
             self.maze = Maze()
         except RuntimeError:
@@ -66,41 +72,67 @@ class Game:
                     self.status = constant.EXIT
 
             if self.status == constant.MENU:
-                self.screen.fill(constant.WHITE)
-                if self.start_button.display(self.screen):
-                    self.status = constant.PLAY
-                if self.quit_button.display(self.screen):
-                    self.status = constant.EXIT
-                self.menu_message.display(self.screen)
-                pygame.display.flip()
+                self._menu()
 
             elif self.status == constant.PLAY:
-                self.status = self.maze.update()
-
-                self.screen.fill(constant.BLACK)
-                self.maze.display(self.screen)
-                pygame.display.flip()
+                self._play()
 
             elif self.status == constant.FINISH:
-                self.screen.fill(constant.WHITE)
-                result = self.maze.final_result()
-                end_message = Message(
-                    (self.width // 2, self.height // 2),
-                    result,
-                    constant.BIG_SIZE,
-                    constant.BIG_FONT,
-                    constant.BLACK
-                )
-                end_message.display(self.screen)
-                pygame.display.flip()
-                time.sleep(1)
-                self.status = constant.RESTART
+                self._finish()
 
             elif self.status == constant.RESTART:
                 self.maze.restart()
                 self.status = constant.MENU
 
         pygame.quit()
+
+    def _menu(self):
+        """ Display for Menu status of game """
+        self.screen.fill(constant.WHITE)
+
+        if self.start_button.display(self.screen):
+            self.status = constant.PLAY
+        if self.quit_button.display(self.screen):
+            self.status = constant.EXIT
+
+        self.menu_message.display(self.screen)
+
+        # Apply changes
+        pygame.display.flip()
+
+    def _play(self):
+        """ Display during Play status of game """
+        # status keep play until maze.update
+        # return constant.FINISH state
+        self.status = self.maze.update()
+
+        self.screen.fill(constant.BLACK)
+        # Display maze and component on screen
+        self.maze.display(self.screen)
+
+        # Apply changes
+        pygame.display.flip()
+
+    def _finish(self):
+        """ Display during Finish status of game """
+        self.screen.fill(constant.WHITE)
+        # Create a message depending of result of game
+        result = self.maze.final_result()
+        end_message = Message(
+            (self.width // 2, self.height // 2),
+            result,
+            constant.BIG_SIZE,
+            constant.BIG_FONT,
+            constant.BLACK
+        )
+        end_message.display(self.screen)
+
+        # Apply changes
+        pygame.display.flip()
+
+        # Wait some time to display message then restart to menu
+        time.sleep(1)
+        self.status = constant.RESTART
 
 
 if __name__ == "__main__":

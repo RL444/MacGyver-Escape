@@ -6,7 +6,8 @@ import pygame
 
 import constant
 from cell import Cell
-from character import Player, Guardian
+from character import Character, Player
+from display import Message
 
 
 class Maze:
@@ -37,7 +38,7 @@ class Maze:
 
         # Initialize Guardian
         index = maze.index("G")
-        self.guardian = Guardian(
+        self.guardian = Character(
             self.assets["guardian"],
             (index % constant.MAZE_SIZE, index // constant.MAZE_SIZE),
         )
@@ -56,7 +57,7 @@ class Maze:
                 Cell(self.assets[constant.ITEMS[i]], self._random_pos())
             )
 
-        # Sprite group for update and display
+        # Sprite group for display
         self.all_sprites = pygame.sprite.Group()
 
         for sprite in self.map.values():
@@ -139,7 +140,7 @@ class Maze:
         self.all_sprites.draw(screen)
 
     def update(self):
-        """Update the status of the maze each frame"""
+        """Update the status of the maze each clock loop"""
         keystate = pygame.key.get_pressed()
         if (
             keystate[pygame.K_LEFT]
@@ -184,7 +185,8 @@ class Maze:
         return constant.PLAY
 
     def final_result(self):
-        """ Return a string to indicate win or lose depending on player and guardian status """
+        """ Return a string to indicate win or lose
+        depending on player and guardian status """
         if self.player.status:
             return "You deliver Mac Gyver !!"
         return "You lose, try again!!"
