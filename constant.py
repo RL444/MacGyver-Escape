@@ -14,7 +14,7 @@ PAUSE = 4
 # Game initialize again game for a new try
 RESTART = 5
 
-FPS = 10
+FPS = 30
 
 # Dimension of maze and sprites
 MAZE_SIZE = 15
@@ -30,7 +30,7 @@ OPTIONAL_W = 0
 DEAD = 0
 ALIVE = 1
 # Speed (pixel per clock loop) of player during displacements
-SPEED = 10
+SPEED = 8
 
 # Colors for screen display
 BLACK = (0, 0, 0)
@@ -45,6 +45,8 @@ RESSOURCE_FOLDER = Path(".") / "ressources"
 # image used as objects during game
 ITEMS = ["plastic_tube", "ether", "needle"]
 WEAPON = "syringe"
+ARROW_NAME = "arrow"
+ARROW_SIZE = 2
 
 # Information on buttons and message during game
 BUTTON_W = 3

@@ -67,6 +67,37 @@ class Maze:
         self.all_sprites.add(self.guardian)
         self.all_sprites.add(self.player)
 
+        # Create Message and Cell to display
+        # if player collect enough items to fight guardian
+
+        self.not_ready_message = Message(
+            (
+                constant.MAZE_SIZE * constant.SPRITE_W * 3 // 4,
+                constant.MAZE_SIZE * constant.SPRITE_H + constant.SPRITE_H // 2,
+            ),
+            "Mac Gywer not Ready, Be Carefull",
+            constant.SMALL_SIZE,
+            constant.BIG_FONT,
+            constant.RED,
+        )
+
+        self.ready_message = Message(
+            (
+                constant.MAZE_SIZE * constant.SPRITE_W * 4 // 5,
+                constant.MAZE_SIZE * constant.SPRITE_H + constant.SPRITE_H // 2,
+            ),
+            "Ready to Fight",
+            constant.SMALL_SIZE,
+            constant.BIG_FONT,
+            constant.GREEN,
+        )
+
+        self.arrow = Cell(self.assets[constant.ARROW_NAME], (len(constant.ITEMS) + 1, constant.MAZE_SIZE))
+        self.weapon = Cell(self.assets[constant.WEAPON], (len(constant.ITEMS) + constant.ARROW_SIZE + 1, constant.MAZE_SIZE))
+        self.weapon_sprites = pygame.sprite.Group()
+        self.weapon_sprites.add(self.arrow)
+        self.weapon_sprites.add(self.weapon)
+
     def restart(self):
         returned_items = self.player.restart()
         for item in returned_items:
@@ -138,42 +169,14 @@ class Maze:
     def display(self, screen):
         """ Display all maze sprites """
         self.all_sprites.draw(screen)
+        if self.player.ready:
+            self.ready_message.display(screen)
+            self.weapon_sprites.draw(screen)
+        else:
+            self.not_ready_message.display(screen)
 
     def update(self):
         """Update the status of the maze each clock loop"""
-        keystate = pygame.key.get_pressed()
-        if (
-            keystate[pygame.K_LEFT]
-            and self.player.pos_left[0] >= 0
-            and self.map[self.player.pos_left].image == self.assets["floor"]
-        ):
-            self.player.move_left()
-
-        if (
-            keystate[pygame.K_RIGHT]
-            and self.player.pos_right[0] < constant.MAZE_SIZE
-            and self.map[self.player.pos_right].image == self.assets["floor"]
-        ):
-            self.player.move_right()
-
-        if (
-            keystate[pygame.K_UP]
-            and self.player.pos_up[1] >= 0
-            and self.map[self.player.pos_up].image == self.assets["floor"]
-        ):
-            self.player.move_up()
-
-        if (
-            keystate[pygame.K_DOWN]
-            and self.player.pos_down[1] < constant.MAZE_SIZE
-            and self.map[self.player.pos_down].image == self.assets["floor"]
-        ):
-            self.player.move_down()
-
-        for i, sprite in enumerate(self.items[:]):
-            if sprite.pos == self.player.pos:
-                self.player.add_item(self.items.pop(i))
-
         if self.player.pos == self.guardian.pos:
             if self.player.ready:
                 self.guardian.death()
@@ -182,7 +185,44 @@ class Maze:
             # If combat between guardian and player: end of the game
             return constant.FINISH
 
+        # player collect an item if on same position
+        for i, sprite in enumerate(self.items[:]):
+            if sprite.pos == self.player.pos:
+                self.player.add_item(self.items.pop(i))
+
+        # Check key pressed for movements
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            target = self.player.pos_left
+        elif keystate[pygame.K_RIGHT]:
+            target = self.player.pos_right
+
+        elif keystate[pygame.K_UP]:
+            target = self.player.pos_up
+
+        elif keystate[pygame.K_DOWN]:
+            target = self.player.pos_down
+        else:
+            target = None
+
+        if target is not None and self._is_valid(target):
+            self.player.set_target(target)
+
+        self.player.update()
+
         return constant.PLAY
+
+    def _is_valid(self, pos):
+        """ return is pos cell can be walk in by player """
+        if(
+            pos[0] >= 0 and
+            pos[1] >= 0 and
+            pos[0] < constant.MAZE_SIZE and
+            pos[1] < constant.MAZE_SIZE and
+            self.map[pos].image == self.assets["floor"]
+        ):
+            return True
+        return False
 
     def final_result(self):
         """ Return a string to indicate win or lose

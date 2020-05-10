@@ -34,3 +34,13 @@ class Cell(pygame.sprite.Sprite):
             pos[0] * constant.SPRITE_W,
             pos[1] * constant.SPRITE_H,
         )
+
+    @property
+    def pos_pixel(self):
+        """Return position in pixel"""
+        return self.rect.topleft
+
+    @pos_pixel.setter
+    def pos_pixel(self, pos):
+        """Set position of sprite in pixel"""
+        self.rect.topleft = (pos[0], pos[1])
