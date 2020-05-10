@@ -1,4 +1,5 @@
-""" Contain Player class to manage player action and status and Guardian class """
+""" Contain Player class to manage player action
+and status and Guardian class """
 from math import copysign
 
 import constant

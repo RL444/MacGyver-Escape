@@ -45,7 +45,7 @@ class Game:
             "Mac Gyver Escape",
             constant.BIG_SIZE,
             constant.BIG_FONT,
-            constant.BLACK
+            constant.BLACK,
         )
 
         self.status = constant.MENU
@@ -123,7 +123,7 @@ class Game:
             result,
             constant.BIG_SIZE,
             constant.BIG_FONT,
-            constant.BLACK
+            constant.BLACK,
         )
         end_message.display(self.screen)
 

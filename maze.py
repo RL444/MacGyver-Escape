@@ -73,7 +73,8 @@ class Maze:
         self.not_ready_message = Message(
             (
                 constant.MAZE_SIZE * constant.SPRITE_W * 3 // 4,
-                constant.MAZE_SIZE * constant.SPRITE_H + constant.SPRITE_H // 2,
+                constant.MAZE_SIZE * constant.SPRITE_H
+                + constant.SPRITE_H // 2,
             ),
             "Mac Gywer not Ready, Be Carefull",
             constant.SMALL_SIZE,
@@ -84,7 +85,8 @@ class Maze:
         self.ready_message = Message(
             (
                 constant.MAZE_SIZE * constant.SPRITE_W * 4 // 5,
-                constant.MAZE_SIZE * constant.SPRITE_H + constant.SPRITE_H // 2,
+                constant.MAZE_SIZE * constant.SPRITE_H
+                + constant.SPRITE_H // 2,
             ),
             "Ready to Fight",
             constant.SMALL_SIZE,
@@ -92,8 +94,17 @@ class Maze:
             constant.GREEN,
         )
 
-        self.arrow = Cell(self.assets[constant.ARROW_NAME], (len(constant.ITEMS) + 1, constant.MAZE_SIZE))
-        self.weapon = Cell(self.assets[constant.WEAPON], (len(constant.ITEMS) + constant.ARROW_SIZE + 1, constant.MAZE_SIZE))
+        self.arrow = Cell(
+            self.assets[constant.ARROW_NAME],
+            (len(constant.ITEMS) + 1, constant.MAZE_SIZE),
+        )
+        self.weapon = Cell(
+            self.assets[constant.WEAPON],
+            (
+                len(constant.ITEMS) + constant.ARROW_SIZE + 1,
+                constant.MAZE_SIZE,
+            ),
+        )
         self.weapon_sprites = pygame.sprite.Group()
         self.weapon_sprites.add(self.arrow)
         self.weapon_sprites.add(self.weapon)
@@ -214,12 +225,12 @@ class Maze:
 
     def _is_valid(self, pos):
         """ return is pos cell can be walk in by player """
-        if(
-            pos[0] >= 0 and
-            pos[1] >= 0 and
-            pos[0] < constant.MAZE_SIZE and
-            pos[1] < constant.MAZE_SIZE and
-            self.map[pos].image == self.assets["floor"]
+        if (
+            pos[0] >= 0
+            and pos[1] >= 0
+            and pos[0] < constant.MAZE_SIZE
+            and pos[1] < constant.MAZE_SIZE
+            and self.map[pos].image == self.assets["floor"]
         ):
             return True
         return False
